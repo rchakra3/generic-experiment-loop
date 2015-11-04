@@ -1,7 +1,6 @@
 from model import Model
 from candidate import Candidate
 from decision import Decision
-import random
 
 
 class Osyczka2(Model):
@@ -53,7 +52,7 @@ class Osyczka2(Model):
     def gen_candidate(self):
         for i in range(0, self.patience):
             decs = [dec.generate_valid_val() for dec in self.decs]
-            can = Candidate(dec_vals=decs)
+            can = Candidate(dec_vals=list(decs))
             if self.ok(can):
                 return can
 
