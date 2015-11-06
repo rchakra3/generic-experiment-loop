@@ -1,6 +1,6 @@
 from model import Model
-from candidate import Candidate
-from decision import Decision
+from helpers.candidate import Candidate
+from helpers.decision import Decision
 import math
 
 

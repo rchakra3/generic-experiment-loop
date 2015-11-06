@@ -2,8 +2,7 @@ from __future__ import division
 import random
 import sys
 import math
-from candidate import Candidate
-from osyczka2 import Osyczka2
+from model.helpers.candidate import Candidate
 """ This contains the optimizers """
 
 

@@ -1,6 +1,6 @@
-from schaffer import Schaffer
-from osyczka2 import Osyczka2
-from kursawe import Kursawe
+from model.schaffer import Schaffer
+from model.osyczka2 import Osyczka2
+from model.kursawe import Kursawe
 from optimizers import sa, mws
 
 
