@@ -5,6 +5,23 @@ Abstractions to enable running (hopefully) any optimizer on specified models
 
 - **These have been run with a threshold of -1, which is never attainable and so they run for the max possible number of iterations**
 
+## Images:
+
+#### Schaffer
+
+![Schaffer](img/Schaffer.png)
+
+#### Osyczka2
+
+![Osyczka2](img/Osyczka2.png)
+
+#### Kursawe
+
+![Kursawe](img/Kursawe.png)
+
+
+## Raw Output [Different run]
+
 *****************************
 sa(Schaffer)
 
