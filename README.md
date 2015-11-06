@@ -17,7 +17,7 @@ Abstractions to enable running (hopefully) any optimizer on specified models
 
 #### Kursawe
 
-![Kursawe](img/Kursawe.png)
+![Kursawe](img/kursawe.png)
 
 
 ## Raw Output [Different run]
