@@ -15,7 +15,7 @@ def sa_default_prob(curr_score, new_score, t):
     return val
 
 
-def sa(model, p=sa_default_prob, threshold=0.8, max_tries=1000, optimal='low'):
+def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, optimal='low'):
 
     best_can = model.gen_candidate()
     while best_can is None:
@@ -57,13 +57,20 @@ def sa(model, p=sa_default_prob, threshold=0.8, max_tries=1000, optimal='low'):
                 print "?",
                 flag = False
 
+            if best_score < threshold:
+                print "\niterations:" + str(i + 1)
+                print "Score:" + str(best_score)
+                return best_can, best_score
+
             if flag is True:
                 print ".",
 
+    print "\niterations:" + str(max_tries)
+    print "Score:" + str(best_score)
     return best_can, best_score
 
 
-def mws(model, p=0.5, threshold=0.99, max_tries=1000, max_changes=50, optimal='low'):
+def mws(model, p=0.5, threshold=0.001, max_tries=100, max_changes=10, optimal='low'):
 
     best_can = None
 
@@ -89,7 +96,8 @@ def mws(model, p=0.5, threshold=0.99, max_tries=1000, max_changes=50, optimal='l
 
             if optimal == 'low':
                 if score < threshold:
-                    print "iterations:" + str(i * max_changes + j)
+                    print "\niterations:" + str(i * max_changes + j)
+                    print "Score:" + str(score)
                     return candidate, score
 
                 if score < best_score:
@@ -100,6 +108,7 @@ def mws(model, p=0.5, threshold=0.99, max_tries=1000, max_changes=50, optimal='l
             else:
                 if score > threshold:
                     print "iterations:" + str(i * max_changes + j)
+                    print "Score:" + str(score)
                     return candidate, score
 
                 if score > best_score:
@@ -134,6 +143,9 @@ def mws(model, p=0.5, threshold=0.99, max_tries=1000, max_changes=50, optimal='l
                 else:
                     print ".",
 
+    print "\niterations:" + str(max_changes * max_tries)
+    print "Best Score:" + str(normalize(model.aggregate(best_can)))
+
     return best_can, normalize(model.aggregate(best_can))
 
 
@@ -166,7 +178,7 @@ def mws_optimize(model, candidate, dec_index, optimization, tries=50):
     return best_can
 
 
-def prerun(model, runs=1000):
+def prerun(model, runs=10000):
     # Let's get this to return a function which normalizes
     min = sys.maxint
     max = -sys.maxint - 1
@@ -195,8 +207,11 @@ def prerun(model, runs=1000):
 
         return ((score - min) / (max - min))
 
+    # print "Min:" + str(min)
+    # print "Max:" + str(max)
+
     return normalize
 
-model = Osyczka2()
-(soln, normalized_score) = mws(model, max_tries=100, max_changes=10, threshold=-1)
-# print normalized_score
+# model = Osyczka2()
+# (soln, normalized_score) = mws(model, max_tries=100, max_changes=10, threshold=-1)
+# # print normalized_score
