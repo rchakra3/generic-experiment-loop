@@ -6,6 +6,79 @@ from model.helpers.candidate import Candidate
 """ This contains the optimizers """
 
 
+def de(model, frontier_size=10, cop=0.5, ea=0.5, eps=0.01):
+
+    normalize = prerun(model, runs=10000)
+
+    frontier = []
+
+    for i in range(frontier_size):
+        can = model.gen_candidate()
+        while can is None:
+            can = model.gen_candidate()
+        frontier += [can]
+
+    total = 0
+    n = 0
+
+    for i in range(frontier_size):
+        total, n = de_update(frontier, cop, ea, model.aggregate, normalize)
+        if total / n > (1 - eps):
+            break
+
+    return frontier
+
+
+def de_update(frontier, cop, ea, aggregate, normalize):
+
+    total, n = (0, 0)
+
+    for i, can in enumerate(frontier):
+        score = normalize(aggregate(can))
+        new_can = de_extrapolate(frontier, i, cop, ea)
+        new_score = normalize(aggregate(new_can))
+
+        if new_score > score:
+            frontier[i] = new_can
+            score = new_score
+        total += score
+        n += 1
+    return total, n
+
+
+def de_extrapolate(frontier, can_index, cop, ea):
+
+    can = frontier[can_index]
+    new_can = Candidate(dec_vals=list(can.dec_vals))
+    two, three, four = get_any_other_three(frontier, can_index)
+
+    changed = False
+
+    for d in range(len(can.dec_vals)):
+        x, y, z = two.dec_vals[d], three.dec_vals[d], four.dec_vals[d]
+
+        if random.random() < cop:
+            changed = True
+            new_can.dec_vals[d] = x + ea * (y - z)
+
+    if not changed:
+        d = random.randint(0, len(can.dec_vals)-1)
+        new_can.dec_vals[d] = two.dec_vals[d]
+    return new_can
+
+
+def get_any_other_three(frontier, ig_index):
+
+    lst = []
+
+    while len(lst) < 3:
+        i = random.randint(0, len(frontier)-1)
+        if i is not ig_index:
+            lst += [frontier[i]]
+
+    return tuple(lst)
+
+
 def sa_default_prob(curr_score, new_score, t):
     if t == 0:
         return 0
