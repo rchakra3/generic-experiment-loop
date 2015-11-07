@@ -1,6 +1,9 @@
+from helpers.candidate import Candidate
+
+
 class Model(object):
 
-    def __init__(self, decs=None, objs=None, patience=50):
+    def __init__(self, decs=None, objs=None, patience=100):
 
         if decs is None:
             decs = []
@@ -18,3 +21,10 @@ class Model(object):
 
     def objectives(self):
         return self.objs
+
+    def gen_candidate(self):
+        for i in range(0, self.patience):
+            decs = [dec.generate_valid_val() for dec in self.decs]
+            can = Candidate(dec_vals=list(decs))
+            if self.ok(can):
+                return can

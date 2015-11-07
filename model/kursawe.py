@@ -1,5 +1,4 @@
 from model import Model
-from helpers.candidate import Candidate
 from helpers.decision import Decision
 import math
 
@@ -51,10 +50,3 @@ class Kursawe(Model):
         for score in candidate.scores:
             aggr += score
         return aggr
-
-    def gen_candidate(self):
-        for i in range(0, self.patience):
-            decs = [dec.generate_valid_val() for dec in self.decs]
-            can = Candidate(dec_vals=list(decs))
-            if self.ok(can):
-                return can
