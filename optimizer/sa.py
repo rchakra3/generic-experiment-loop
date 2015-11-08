@@ -32,10 +32,11 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
         total = 0
         n = 0
         for obj_scores1, obj_scores2 in zip(era1, era2):
-            # If this is 1, that means new one is worse
+            # If this is 1, that means era1 is greater more often
+            # If minimizing, this means era1 is worse
             total += a12(obj_scores1, obj_scores2)
             n += 1
-        return (total / n < 0.5)
+        return (total / n > 0.5)
 
     # This stores a list of era entries, i.e a list of  [list of objective scores for every candidate in the era]
     # Assume one era is 5 candidates
@@ -55,7 +56,7 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
 
     else:
         # List of List. Need to deepcopy internal list too
-        curr_era = list([list(x) for x in era0])
+        curr_era = [n_score(can) for can in era0]
         best_can = curr_era[0]
         for can in curr_era:
             if n_score(can) < n_score(best_can):
@@ -94,7 +95,7 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
                 if len(eras) > 1:
                     last_index = len(eras) - 1
                     # If there is improvement reset lives, else decrement
-                    if (type2(eras[last_index], eras[last_index - 1])):
+                    if (type2(eras[last_index - 1], eras[last_index])):
                         curr_lives = lives
                     else:
                         curr_lives -= 1

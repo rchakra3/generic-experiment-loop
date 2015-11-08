@@ -8,7 +8,7 @@ from optimizer.de import de
 
 
 for model in [Schaffer, Osyczka2, Kursawe, Golinski]:
-    for optimizer in [de, sa, mws]:
+    for optimizer in [de]:  # , sa, mws]:
         print "\n*****************************"
         print optimizer.__name__ + "(" + model.__name__ + ")"
         optimizer(model(), threshold=-1)

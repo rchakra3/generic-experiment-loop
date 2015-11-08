@@ -3,10 +3,11 @@ import random
 import math
 from common import prerun_each_obj
 from model.helpers.candidate import Candidate
+from helpers.a12 import a12
 """ This contains the optimizers """
 
 
-def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01):
+def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01, era_size=10, era0=None, lives=5):
 
     normalizers = prerun_each_obj(model, runs=10000)
     out = []
@@ -25,18 +26,47 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01):
 
         return energy
 
+    def type1(can1, can2):
+        return (energy(can1) < energy(can2))
+
+    def type2(era1, era2):
+        # a12 returns times that lst1 is greater than lst2
+        total = 0
+        n = 0
+        for obj_scores1, obj_scores2 in zip(era1, era2):
+            # If this is 1, that means era1 is greater more often
+            # If minimizing, this means era1 is worse
+            total += a12(obj_scores1, obj_scores2)
+            n += 1
+        return (total / n > 0.5)
+
     frontier = []
 
-    for i in range(frontier_size):
-        can = model.gen_candidate()
-        while can is None:
+    if not era0:
+        for i in range(frontier_size):
             can = model.gen_candidate()
-        frontier += [can]
+            while can is None:
+                can = model.gen_candidate()
+            frontier += [can]
+
+    else:
+        frontier += list(era0)
+
+    curr_era = []
+
+    for can in frontier:
+        curr_era += [[energy(can)]]
+
+    # Currently treating candidates as having only one objective i.e. energy
+    # which we're minimizing
+    eras = [curr_era]
+    curr_era = []
 
     total = 0
     n = 0
 
     best_score = 1.0
+    curr_lives = lives
 
     for j in range(repeat):
 
@@ -47,11 +77,28 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01):
         if total / n < threshold:
             best_score = total / n
             out += ["!"]
+            out += ["\nScore satisfies Threshold"]
             break
 
         elif total / n < best_score:
             best_score = total / n
             out += ["!"]
+
+        for can in frontier:
+            curr_era += [[energy(can)]]
+
+        eras += [curr_era]
+        curr_era = []
+
+        if len(eras) > 1:
+            if type2(eras[len(eras) - 2], eras[len(eras) - 1]):
+                curr_lives = lives
+            else:
+                curr_lives -= 1
+                if curr_lives == 0:
+                            out += ["\nNo more Lives"]
+                            break
+
 
     print ''.join(out)
     print "\nNumber of repeat:" + str(j + 1)
