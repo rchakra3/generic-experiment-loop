@@ -38,9 +38,11 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01, era
             # If minimizing, this means era1 is worse
             total += a12(obj_scores1, obj_scores2)
             n += 1
-        return (total / n > 0.5)
+        return (total / n >= 0.5)
 
     frontier = []
+    total = 0
+    n = 0
 
     if not era0:
         for i in range(frontier_size):
@@ -48,9 +50,13 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01, era
             while can is None:
                 can = model.gen_candidate()
             frontier += [can]
+            total += energy(can)
+            n += 1
 
     else:
-        frontier += list(era0)
+        frontier = list(era0)
+        total = sum([energy(can) for can in frontier])
+        n = len(frontier)
 
     curr_era = []
 
@@ -62,11 +68,9 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01, era
     eras = [curr_era]
     curr_era = []
 
-    total = 0
-    n = 0
-
-    best_score = 1.0
+    best_score = total / n
     curr_lives = lives
+    early_end = False
 
     for j in range(repeat):
 
@@ -96,12 +100,11 @@ def de(model, frontier_size=10, cop=0.5, ea=0.5, repeat=100, threshold=0.01, era
             else:
                 curr_lives -= 1
                 if curr_lives == 0:
-                            out += ["\nNo more Lives"]
-                            break
-
+                    out += ["\nNo more Lives"]
+                    break
 
     print ''.join(out)
-    print "\nNumber of repeat:" + str(j + 1)
+    print "\nNumber of repeats:" + str(j + 1)
     print "Best Score:" + str(best_score)
     return frontier, best_score
 

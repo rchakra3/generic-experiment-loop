@@ -28,7 +28,7 @@ def mws(model, p=0.5, threshold=0.001, max_tries=100, max_changes=10, era_size=1
             # If this is 1, that means new one is worse
             total += a12(obj_scores1, obj_scores2)
             n += 1
-        return (total / n > 0.5)
+        return (total / n >= 0.5)
 
     best_score = 1.0
 
@@ -38,9 +38,16 @@ def mws(model, p=0.5, threshold=0.001, max_tries=100, max_changes=10, era_size=1
 
     else:
         # List of List. Need to deepcopy internal list too
-        curr_era = [n_score(can) for can in era0]
-        best_can = curr_era[0]
-        for can in curr_era:
+        curr_era = []
+        era0_copy = list(era0)
+        for can in era0_copy:
+            curr_era += []
+            model.eval(can)
+            obj_scores = [x for x in can.scores]
+            curr_era += [obj_scores]
+
+        best_can = era0_copy[0]
+        for can in era0_copy:
             can_score = n_score(can)
             if can_score < n_score(best_can):
                 best_can = can

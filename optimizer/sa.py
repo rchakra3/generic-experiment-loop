@@ -36,7 +36,7 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
             # If minimizing, this means era1 is worse
             total += a12(obj_scores1, obj_scores2)
             n += 1
-        return (total / n > 0.5)
+        return (total / n >= 0.5)
 
     # This stores a list of era entries, i.e a list of  [list of objective scores for every candidate in the era]
     # Assume one era is 5 candidates
@@ -56,12 +56,19 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
 
     else:
         # List of List. Need to deepcopy internal list too
-        curr_era = [n_score(can) for can in era0]
-        best_can = curr_era[0]
-        for can in curr_era:
-            if n_score(can) < n_score(best_can):
+        curr_era = []
+        era0_copy = list(era0)
+        for can in era0_copy:
+            curr_era += []
+            model.eval(can)
+            obj_scores = [x for x in can.scores]
+            curr_era += [obj_scores]
+
+        best_can = era0_copy[0]
+        for can in era0_copy:
+            if type1(best_can, can):
                 best_can = can
-        curr_can = curr_era[len(curr_era) - 1]
+        curr_can = era0_copy[len(era0_copy) - 1]
         curr_score = n_score(curr_can)
 
     best_score = n_score(best_can)

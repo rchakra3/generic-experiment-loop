@@ -8,8 +8,19 @@ from optimizer.de import de
 
 
 for model in [Schaffer, Osyczka2, Kursawe, Golinski]:
-    for optimizer in [de]:  # , sa, mws]:
+
+    era_size = 10
+
+    era0 = []
+
+    while(len(era0) < era_size):
+        model_instance = model()
+        can = model_instance.gen_candidate()
+        if can:
+            era0 += [can]
+
+    for optimizer in [de, sa, mws]:
         print "\n*****************************"
         print optimizer.__name__ + "(" + model.__name__ + ")"
-        optimizer(model(), threshold=-1)
+        optimizer(model_instance, threshold=-1, era_size=era_size, era0=era0)
         print "*****************************\n"
