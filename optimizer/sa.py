@@ -33,7 +33,7 @@ def sa(model, p=sa_default_prob, threshold=0.001, max_tries=1000, lives=5, era_s
         n = 0
         for obj_scores1, obj_scores2 in zip(era1, era2):
             # If this is 1, that means era1 is greater more often
-            # If minimizing, this means era1 is worse
+            # If minimizing, this means era2 is better
             total += a12(obj_scores1, obj_scores2)
             n += 1
         return (total / n >= 0.5)
